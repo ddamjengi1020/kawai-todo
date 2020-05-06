@@ -3,9 +3,9 @@ import {
   View,
   Text,
   StyleSheet,
-  Button,
   Dimensions,
   TouchableOpacity,
+  TextInput,
 } from "react-native";
 
 const { width, height } = Dimensions.get("window");
@@ -14,9 +14,11 @@ export default class Todo extends React.Component {
   state = {
     isEdit: false,
     isComplete: false,
+    todoValue: "",
   };
   render() {
-    const { isComplete } = this.state;
+    const { isComplete, isEdit, todoValue } = this.state;
+    const { text } = this.props;
     return (
       <View style={styles.content}>
         <TouchableOpacity onPress={this._toggleComplete}>
@@ -27,14 +29,76 @@ export default class Todo extends React.Component {
             ]}
           />
         </TouchableOpacity>
-        <Text style={styles.text}>Hello, This is Todo area</Text>
-        <Button title={"📐"} color={"white"} style={styles.editBtn} />
+        {isEdit ? (
+          <TextInput
+            style={[
+              styles.text,
+              styles.input,
+              isComplete ? styles.textComplete : styles.textUncomplete,
+            ]}
+            multiline={true}
+            value={todoValue}
+            returnKeyType={"done"}
+            onChangeText={this._editChange}
+          />
+        ) : (
+          <Text
+            style={[
+              styles.text,
+              isComplete ? styles.textComplete : styles.textUncomplete,
+            ]}
+            multiline={true}
+          >
+            {text}
+          </Text>
+        )}
+        <View style={styles.actions}>
+          {isEdit ? (
+            <View>
+              <TouchableOpacity onPress={this._onFinish}>
+                <View style={styles.actionBtn}>
+                  <Text>✅</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={styles.actionContainer}>
+              <TouchableOpacity onPress={this._onEdit}>
+                <View style={styles.actionBtn}>
+                  <Text>💬</Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity>
+                <View style={styles.actionBtn}>
+                  <Text>❌</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
       </View>
     );
   }
   _toggleComplete = () => {
     this.setState((prestate) => {
       return { isComplete: !prestate.isComplete };
+    });
+  };
+  _onEdit = () => {
+    const { text } = this.props;
+    this.setState({
+      isEdit: true,
+      todoValue: text,
+    });
+  };
+  _editChange = (text) => {
+    this.setState({
+      todoValue: text,
+    });
+  };
+  _onFinish = () => {
+    this.setState({
+      isEdit: false,
     });
   };
 }
@@ -45,7 +109,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-around",
+    justifyContent: "space-between",
     borderBottomWidth: StyleSheet.hairlineWidth,
     paddingTop: 20,
     paddingBottom: 20,
@@ -56,6 +120,7 @@ const styles = StyleSheet.create({
     height: 30,
     borderRadius: 15,
     borderWidth: 3,
+    marginRight: 15,
   },
   complete: {
     borderColor: "#bbb",
@@ -64,7 +129,32 @@ const styles = StyleSheet.create({
     borderColor: "#F23657",
   },
   text: {
+    width: width / 2,
     fontSize: 20,
   },
-  editBtn: {},
+  textComplete: {
+    color: "#bbb",
+    textDecorationLine: "line-through",
+  },
+  textUncomplete: {
+    color: "black",
+  },
+  actions: {
+    width: width / 2,
+    flex: 1,
+    alignItems: "center",
+  },
+  actionContainer: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  actionBtn: {
+    marginHorizontal: 8,
+    marginVertical: 8,
+  },
+  input: {
+    width: width / 2,
+    lineHeight: 19,
+  },
 });

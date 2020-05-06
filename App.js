@@ -10,15 +10,23 @@ import {
   ScrollView,
 } from "react-native";
 import Todo from "./Todo";
+import { AppLoading } from "expo";
 
 const { width, height } = Dimensions.get("window");
 
 export default class App extends React.Component {
   state = {
     newText: "",
+    isLoading: true,
   };
+  componentDidMount() {
+    this._loadComplete();
+  }
   render() {
-    return (
+    const { isLoading } = this.state;
+    return isLoading ? (
+      <AppLoading />
+    ) : (
       <View style={styles.container}>
         <StatusBar barStyle="light-content" />
         <Text style={styles.title}>Kawai To Do</Text>
@@ -33,7 +41,7 @@ export default class App extends React.Component {
             autoCorrect={false}
           />
           <ScrollView contentContainerStyle={styles.toDos}>
-            <Todo />
+            <Todo text={"hello"} />
           </ScrollView>
         </View>
       </View>
@@ -43,6 +51,11 @@ export default class App extends React.Component {
     console.log(text);
     this.setState({
       newText: text,
+    });
+  };
+  _loadComplete = () => {
+    this.setState({
+      isLoading: false,
     });
   };
 }
@@ -70,11 +83,11 @@ const styles = StyleSheet.create({
     ...Platform.select({
       ios: {
         shadowColor: "black",
-        shadowOpacity: 0.5,
+        shadowOpacity: 0.4,
         shadowRadius: 10,
         shadowOffset: {
           width: 0,
-          height: -1,
+          height: -0.5,
         },
       },
       android: {
