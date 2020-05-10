@@ -7,18 +7,28 @@ import {
   TouchableOpacity,
   TextInput,
 } from "react-native";
+import PropTypes from "prop-types";
 
 const { width, height } = Dimensions.get("window");
 
 export default class Todo extends React.Component {
-  state = {
-    isEdit: false,
-    isComplete: false,
-    todoValue: "",
+  constructor(props) {
+    super(props);
+    this.state = {
+      isEdit: false,
+      isComplete: false,
+      todoValue: props.text,
+    };
+  }
+  static propTypes = {
+    text: PropTypes.string.isRequired,
+    isCompleted: PropTypes.bool.isRequired,
+    delTodo: PropTypes.func.isRequired,
+    id: PropTypes.number.isRequired,
   };
   render() {
     const { isComplete, isEdit, todoValue } = this.state;
-    const { text } = this.props;
+    const { text, delTodo, id } = this.props;
     return (
       <View style={styles.content}>
         <TouchableOpacity onPress={this._toggleComplete}>
@@ -55,7 +65,7 @@ export default class Todo extends React.Component {
         <View style={styles.actions}>
           {isEdit ? (
             <View>
-              <TouchableOpacity onPress={this._onFinish}>
+              <TouchableOpacity onPressOut={this._onFinish}>
                 <View style={styles.actionBtn}>
                   <Text>✅</Text>
                 </View>
@@ -63,12 +73,12 @@ export default class Todo extends React.Component {
             </View>
           ) : (
             <View style={styles.actionContainer}>
-              <TouchableOpacity onPress={this._onEdit}>
+              <TouchableOpacity onPressOut={this._onEdit}>
                 <View style={styles.actionBtn}>
-                  <Text>💬</Text>
+                  <Text>📝</Text>
                 </View>
               </TouchableOpacity>
-              <TouchableOpacity>
+              <TouchableOpacity onPressOut={() => delTodo(id)}>
                 <View style={styles.actionBtn}>
                   <Text>❌</Text>
                 </View>
