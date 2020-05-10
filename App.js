@@ -12,7 +12,7 @@ import {
 import Todo from "./Todo";
 import { AppLoading } from "expo";
 
-const { width, height } = Dimensions.get("window");
+const { width } = Dimensions.get("window");
 
 export default class App extends React.Component {
   state = {
@@ -44,7 +44,14 @@ export default class App extends React.Component {
           />
           <ScrollView contentContainerStyle={styles.toDos}>
             {Object.values(toDos).map((toDo) => (
-              <Todo key={toDo.id} {...toDo} delTodo={this._delToDo} />
+              <Todo
+                key={toDo.id}
+                unCompleted={this._unCompleted}
+                completed={this._completed}
+                delTodo={this._delToDo}
+                updateTodo={this._updateTodo}
+                {...toDo}
+              />
             ))}
           </ScrollView>
         </View>
@@ -93,6 +100,51 @@ export default class App extends React.Component {
       const newState = {
         ...prevState,
         ...toDos,
+      };
+      return { ...newState };
+    });
+  };
+  _unCompleted = (id) => {
+    this.setState((prevState) => {
+      const newState = {
+        ...prevState,
+        toDos: {
+          ...prevState.toDos,
+          [id]: {
+            ...prevState.toDos[id],
+            isCompleted: false,
+          },
+        },
+      };
+      return { ...newState };
+    });
+  };
+  _completed = (id) => {
+    this.setState((prevState) => {
+      const newState = {
+        ...prevState,
+        toDos: {
+          ...prevState.toDos,
+          [id]: {
+            ...prevState.toDos[id],
+            isCompleted: true,
+          },
+        },
+      };
+      return { ...newState };
+    });
+  };
+  _updateTodo = (id, text) => {
+    this.setState((prevState) => {
+      const newState = {
+        ...prevState,
+        toDos: {
+          ...prevState.toDos,
+          [id]: {
+            ...prevState.toDos[id],
+            text,
+          },
+        },
       };
       return { ...newState };
     });

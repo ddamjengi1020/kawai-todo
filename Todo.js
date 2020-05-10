@@ -9,14 +9,13 @@ import {
 } from "react-native";
 import PropTypes from "prop-types";
 
-const { width, height } = Dimensions.get("window");
+const { width } = Dimensions.get("window");
 
 export default class Todo extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       isEdit: false,
-      isComplete: false,
       todoValue: props.text,
     };
   }
@@ -25,17 +24,20 @@ export default class Todo extends React.Component {
     isCompleted: PropTypes.bool.isRequired,
     delTodo: PropTypes.func.isRequired,
     id: PropTypes.number.isRequired,
+    unCompleted: PropTypes.func.isRequired,
+    completed: PropTypes.func.isRequired,
+    updateTodo: PropTypes.func.isRequired,
   };
   render() {
-    const { isComplete, isEdit, todoValue } = this.state;
-    const { text, delTodo, id } = this.props;
+    const { isEdit, todoValue } = this.state;
+    const { text, delTodo, id, isCompleted } = this.props;
     return (
       <View style={styles.content}>
         <TouchableOpacity onPress={this._toggleComplete}>
           <View
             style={[
               styles.circle,
-              isComplete ? styles.complete : styles.unComplete,
+              isCompleted ? styles.complete : styles.unComplete,
             ]}
           />
         </TouchableOpacity>
@@ -44,7 +46,7 @@ export default class Todo extends React.Component {
             style={[
               styles.text,
               styles.input,
-              isComplete ? styles.textComplete : styles.textUncomplete,
+              isCompleted ? styles.textComplete : styles.textUncomplete,
             ]}
             multiline={true}
             value={todoValue}
@@ -55,7 +57,7 @@ export default class Todo extends React.Component {
           <Text
             style={[
               styles.text,
-              isComplete ? styles.textComplete : styles.textUncomplete,
+              isCompleted ? styles.textComplete : styles.textUncomplete,
             ]}
             multiline={true}
           >
@@ -90,9 +92,12 @@ export default class Todo extends React.Component {
     );
   }
   _toggleComplete = () => {
-    this.setState((prestate) => {
-      return { isComplete: !prestate.isComplete };
-    });
+    const { completed, unCompleted, isCompleted, id } = this.props;
+    if (isCompleted) {
+      unCompleted(id);
+    } else {
+      completed(id);
+    }
   };
   _onEdit = () => {
     const { text } = this.props;
@@ -107,6 +112,9 @@ export default class Todo extends React.Component {
     });
   };
   _onFinish = () => {
+    const { todoValue } = this.state;
+    const { id, updateTodo } = this.props;
+    updateTodo(id, todoValue);
     this.setState({
       isEdit: false,
     });
